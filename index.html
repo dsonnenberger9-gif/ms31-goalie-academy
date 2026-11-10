@@ -58,7 +58,7 @@ const current=quizQuestions[quizAt],p=document.createElement('h3');p.textContent
 const alternatives=[...new Set(quizPool().filter(x=>x[0]!==current[0]&&x[1]!==current[1]).map(x=>x[1]))];const optionSeed=seedHash(`${localDay()}|${dailyQuiz.currentVariant}|${quizAt}|${current[0]}`);const options=seededShuffle([current[1],...seededShuffle(alternatives,optionSeed).slice(0,3)],optionSeed^0x9e3779b9);const feedback=document.createElement('p');
 for(const option of options){const b=document.createElement('button');b.style.margin='4px';b.textContent=option;b.onclick=()=>{if(quizAnswered)return;quizAnswered=true;const ok=option===current[1];if(ok)quizScore++;updateReview(current[0],ok);feedback.textContent=ok?'Richtig.':`Richtig ist: ${current[1]}`;area.querySelectorAll('button').forEach(x=>x.disabled=true);const next=document.createElement('button');next.className='primary';next.textContent=quizAt===quizQuestions.length-1?'Ergebnis ansehen':'Nächste Frage →';next.onclick=()=>{quizAt++;quizAnswered=false;showQuiz()};area.append(next)};area.append(b)}area.append(feedback)}
 document.getElementById('quizStart').onclick=()=>startDailyQuiz(false);document.getElementById('smartQuizStart').onclick=()=>startDailyQuiz(true);
-document.getElementById('quizNextVariant').onclick=startDailyQuiz;
+document.getElementById('quizNextVariant').onclick=()=>startDailyQuiz(false);
 dailyQuizStatus();vocabRender();
 
 // V9: bounded, deterministic study queue; no score based on goals conceded.
