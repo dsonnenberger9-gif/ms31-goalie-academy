@@ -1,4 +1,4 @@
-const CACHE='ms31-academy-v13-4-quality-audit';
+const CACHE='ms31-academy-v13-5-auto-advance';
 const FILES=['./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./icon-maskable-512.png'];
 self.addEventListener('install',event=>{
  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()));
