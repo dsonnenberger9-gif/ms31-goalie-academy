@@ -326,8 +326,9 @@ function liveAsk(){
  const seconds=Number(document.getElementById('livePressure').value);
  liveQuestionAt=performance.now();
  livePrompt.textContent='Entscheidung: '+scene.question+(seconds?' · '+seconds+' Sekunden Zeit':' · Ohne Zeitdruck');
- for(const [i,answer] of scene.answers.entries()){
-  const b=document.createElement('button');b.textContent=answer;
+ const order=scene.answers.map((_,i)=>i);for(let j=order.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[order[j],order[k]]=[order[k],order[j]]}
+ for(const i of order){
+  const answer=scene.answers[i];const b=document.createElement('button');b.textContent=answer;
   b.style.cssText='display:block;width:100%;margin:8px 0;text-align:left;white-space:normal;line-height:1.4';
   b.onclick=()=>{if(seconds&&performance.now()-liveQuestionAt>=seconds*1000){liveFinish(-1);return}liveFinish(i)};
   liveAnswers.append(b);
