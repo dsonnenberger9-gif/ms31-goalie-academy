@@ -570,7 +570,7 @@ function mixedRender(){
   }
   const h=document.createElement('h3');h.textContent='Mission geschafft: '+mixedScore+' von '+mixedItems.length+' richtig';
   const p=document.createElement('p');p.textContent='Gute Arbeit. Morgen wartet wieder eine Tagesmission; du kannst auch jetzt erneut üben.';
-  area.append(h,p);return;
+  area.append(h,p);const view=document.createElement('button');view.className='primary';view.textContent='Meinen Lernfortschritt ansehen →';view.onclick=()=>navigateMS31('progress');area.append(view);return;
  }
  const item=mixedItems[mixedAt];const h=document.createElement('h4');h.textContent='Aufgabe '+(mixedAt+1)+'/8 · '+item.type;area.append(h);
  const q=document.createElement('p');q.textContent=item.question;area.append(q);
