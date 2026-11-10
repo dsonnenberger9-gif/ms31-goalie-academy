@@ -45,7 +45,7 @@ try{
   await page.locator('#scenarioTopic').selectOption('kids');
   await page.locator('#scenarioStart').click();
   for(let n=0;n<3;n++){
-   await page.locator('#scenarioArea .scenarioChoice').first().click();
+   await page.locator('#scenarioArea button:not(.primary)').first().click();
    await page.locator('#scenarioArea button.primary').last().click();
   }
   await page.locator('[data-tab="progress"]').click();
