@@ -420,8 +420,8 @@ academyRenderTech();academyRenderMental();
 const coachKey='ms31_coach_plan_v1';
 function coachValidate(v){
  if(!v||typeof v!=='object'||Array.isArray(v))return {goal:null,observations:[]};
- const validGoal=g=>g&&typeof g==='object'&&typeof g.topic==='string'&&g.topic.length<=60&&typeof g.text==='string'&&g.text.length<=200&&typeof g.date==='string'&&/^\\d{4}-\\d{2}-\\d{2}$/.test(g.date);
- const validObs=o=>o&&typeof o==='object'&&typeof o.date==='string'&&/^\\d{4}-\\d{2}-\\d{2}$/.test(o.date)&&['tried','progress','question'].includes(o.status)&&typeof o.note==='string'&&o.note.length<=240&&typeof o.topic==='string'&&o.topic.length<=60;
+ const validGoal=g=>g&&typeof g==='object'&&typeof g.topic==='string'&&g.topic.length<=60&&typeof g.text==='string'&&g.text.length<=200&&typeof g.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(g.date);
+ const validObs=o=>o&&typeof o==='object'&&typeof o.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(o.date)&&['tried','progress','question'].includes(o.status)&&typeof o.note==='string'&&o.note.length<=240&&typeof o.topic==='string'&&o.topic.length<=60;
  return {goal:validGoal(v.goal)?v.goal:null,observations:Array.isArray(v.observations)?v.observations.filter(validObs).slice(0,60):[]};
 }
 let coachPlan=coachValidate(read(coachKey,null));
@@ -457,7 +457,7 @@ document.getElementById('coachExport').onclick=()=>{
 coachRender();
 // Local video review: object URLs are transient; no video bytes are persisted.
 const videoNotesKey='ms31_video_notes_v1';
-function validateVideoNotes(v){return Array.isArray(v)?v.filter(x=>x&&typeof x.date==='string'&&/^\\d{4}-\\d{2}-\\d{2}$/.test(x.date)&&typeof x.question==='string'&&x.question.length<=120&&typeof x.note==='string'&&x.note.length<=350&&Number.isFinite(x.second)&&x.second>=0&&x.second<=86400).slice(0,40):[]}
+function validateVideoNotes(v){return Array.isArray(v)?v.filter(x=>x&&typeof x.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&typeof x.question==='string'&&x.question.length<=120&&typeof x.note==='string'&&x.note.length<=350&&Number.isFinite(x.second)&&x.second>=0&&x.second<=86400).slice(0,40):[]}
 let videoNotes=validateVideoNotes(read(videoNotesKey,[])),videoObjectUrl=null;
 const analysisVideo=document.getElementById('analysisVideo');
 function videoRelease(){
