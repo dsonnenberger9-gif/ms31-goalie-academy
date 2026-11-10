@@ -269,8 +269,9 @@ function iqShowFollowup(){
  const event=document.createElement('p');event.textContent=scene.event;
  const q=document.createElement('p');q.textContent=scene.q;
  area.append(h,event,q);
- scene.answers.forEach((answer,i)=>{
-  const b=document.createElement('button');b.textContent=answer;
+ const order=scene.answers.map((_,i)=>i);for(let j=order.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[order[j],order[k]]=[order[k],order[j]]}
+ order.forEach(i=>{
+  const answer=scene.answers[i];const b=document.createElement('button');b.textContent=answer;
   b.style.cssText='display:block;width:100%;margin:8px 0;text-align:left;white-space:normal;line-height:1.4';
   b.onclick=()=>{
    if(iqSecondDone)return;
@@ -403,7 +404,7 @@ function academyRenderTech(){
 function academyRenderMental(){
  const d=academyMental[Number(document.getElementById('mentalScenario').value)]||academyMental[0],area=document.getElementById('mentalLesson');area.replaceChildren();
  const q=document.createElement('p');q.textContent=d.question;area.append(q);
- const order=d.answers.map((_,i)=>i).sort(()=>Math.random()-.5);
+ const order=d.answers.map((_,i)=>i);for(let j=order.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[order[j],order[k]]=[order[k],order[j]]}
  order.forEach(i=>{const b=document.createElement('button');b.textContent=d.answers[i];b.style.cssText='display:block;width:100%;margin:8px 0;text-align:left;white-space:normal;line-height:1.4';b.onclick=()=>{area.querySelectorAll('button').forEach(x=>x.disabled=true);document.getElementById('mentalFeedback').textContent=(i===d.right?'Gute Entscheidung. ':'Eine andere Antwort ist hilfreicher. ')+d.why;};area.append(b)});
  const saved=academyGoalRead(academyMentalKey);
  document.getElementById('mentalSaved').textContent=saved?'Gemerkter Schritt: '+saved.topic+(saved.note?' – '+saved.note:''):'Noch kein Schritt gespeichert.';
@@ -437,14 +438,14 @@ function coachRender(){
 document.getElementById('coachSave').onclick=()=>{
  const topic=document.getElementById('coachTopic').value,text=document.getElementById('coachGoal').value.trim();
  if(!text){showToast('Bitte ein konkretes Wochenziel eingeben.');return}
- const candidate={...coachPlan,goal:{topic,text:text.slice(0,200),date:new Date().toLocaleDateString('en-CA')}};
+ const candidate={...coachPlan,goal:{topic,text:text.slice(0,200),date:localDay()}};
  if(safeSave(coachKey,candidate)){coachPlan=candidate;coachRender();showToast('Wochenziel gespeichert.')}
 };
 document.getElementById('coachAdd').onclick=()=>{
  if(!coachPlan.goal){showToast('Zuerst ein Wochenziel festlegen.');return}
  const note=document.getElementById('coachNote').value.trim(),status=document.getElementById('coachObservation').value;
  if(!note){showToast('Bitte eine konkrete Beobachtung eingeben.');return}
- const date=new Date().toLocaleDateString('en-CA');
+ const date=localDay();
  const candidate={...coachPlan,observations:[{date,topic:coachPlan.goal.topic,status,note:note.slice(0,240)},...coachPlan.observations].slice(0,60)};
  if(safeSave(coachKey,candidate)){coachPlan=candidate;document.getElementById('coachNote').value='';coachRender();showToast('Beobachtung gespeichert.')}
 };
@@ -487,7 +488,7 @@ document.getElementById('videoPause').onclick=()=>{if(!videoObjectUrl)return;if(
 document.getElementById('videoClear').onclick=()=>{videoRelease();document.getElementById('videoFile').value='';document.getElementById('videoStatus').textContent='Video entfernt. Gespeicherte Textbeobachtungen bleiben erhalten.'};
 document.getElementById('videoSave').onclick=()=>{
  if(!videoObjectUrl){showToast('Zuerst ein Video auswählen.');return}
- const item={date:new Date().toLocaleDateString('en-CA'),second:Math.round(analysisVideo.currentTime*10)/10,question:document.getElementById('videoQuestion').value,note:document.getElementById('videoNote').value.trim().slice(0,350)};
+ const item={date:localDay(),second:Math.round(analysisVideo.currentTime*10)/10,question:document.getElementById('videoQuestion').value,note:document.getElementById('videoNote').value.trim().slice(0,350)};
  if(!Number.isFinite(item.second))return;
  const candidate=[item,...videoNotes].slice(0,40);
  if(safeSave(videoNotesKey,candidate)){videoNotes=candidate;document.getElementById('videoNote').value='';videoRenderNotes();showToast('Textbeobachtung gespeichert.')}
