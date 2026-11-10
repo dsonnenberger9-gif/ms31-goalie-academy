@@ -64,9 +64,35 @@ function renderScenario(){const area=document.getElementById('scenarioArea');are
 document.getElementById('scenarioStart').onclick=()=>{scenarioQuestions=shuffled(scenarios).slice(0,5);scenarioAt=0;scenarioScore=0;renderScenario()};
 // Hockey English: speech playback is local browser speech synthesis, if supported.
 const speakCardBtn=document.getElementById('speakCard');
+let activeEnglishUtterance=null;
+let englishVoiceList=[];
+function refreshEnglishVoices(){
+ try{englishVoiceList=window.speechSynthesis.getVoices().filter(v=>/^en([-_]|$)/i.test(v.lang));}catch(e){englishVoiceList=[];}
+}
+if('speechSynthesis' in window){
+ refreshEnglishVoices();
+ window.speechSynthesis.addEventListener?.('voiceschanged',refreshEnglishVoices);
+}
 function speakEnglish(phrase){
- if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){showToast('Sprachausgabe auf diesem Gerät nicht verfügbar.');return false;}
- try{speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(phrase);utter.lang='en-US';utter.rate=0.78;utter.pitch=1;const voices=speechSynthesis.getVoices();const english=voices.find(v=>v.lang.toLowerCase()==='en-us')||voices.find(v=>v.lang.toLowerCase().startsWith('en'));if(english)utter.voice=english;speechSynthesis.speak(utter);return true;}catch(e){showToast('Sprachausgabe konnte nicht gestartet werden.');return false;}
+ if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){
+  showToast('Keine Sprachausgabe verfügbar. Bitte Safari und iOS-Sprachstimmen prüfen.');return false;
+ }
+ try{
+  const synth=window.speechSynthesis;
+  refreshEnglishVoices();
+  // Start synchronously inside the button click: iOS requires a user gesture.
+  synth.cancel();
+  const utter=new SpeechSynthesisUtterance(String(phrase));
+  utter.lang='en-US';utter.rate=0.85;utter.pitch=1;utter.volume=1;
+  const voice=englishVoiceList.find(v=>/^en-US$/i.test(v.lang))||englishVoiceList.find(v=>/^en/i.test(v.lang));
+  if(voice)utter.voice=voice;
+  activeEnglishUtterance=utter; // retain until speech finishes (WebKit).
+  utter.onend=()=>{if(activeEnglishUtterance===utter)activeEnglishUtterance=null;};
+  utter.onerror=e=>{if(activeEnglishUtterance===utter)activeEnglishUtterance=null;if(e.error!=='canceled'&&e.error!=='interrupted')showToast('Sprachausgabe fehlgeschlagen: '+(e.error||'Stimme nicht verfügbar')+'. Bitte erneut tippen.');};
+  synth.speak(utter);
+  if(synth.paused)synth.resume();
+  return true;
+ }catch(e){showToast('Sprachausgabe konnte nicht gestartet werden.');return false;}
 }
 speakCardBtn.onclick=()=>speakEnglish(vocabItems()[flashIndex%vocabItems().length][0]);
 let listening=[],listenAt=0,listenScore=0,listenAnswered=false;
@@ -77,7 +103,7 @@ function listenRender(){const area=document.getElementById('listenArea');area.re
  const feedback=document.createElement('p');for(const answer of options){const b=document.createElement('button');b.textContent=answer;b.style.margin='5px';b.onclick=()=>{if(listenAnswered)return;listenAnswered=true;const correct=answer===item[1];if(correct)listenScore++;updateReview(item[0],correct);feedback.textContent=correct?`Richtig! „${item[0]}“ bedeutet: ${item[1]}`:`Die richtige Antwort: „${item[0]}“ = ${item[1]}`;area.querySelectorAll('button').forEach(x=>x.disabled=true);const next=document.createElement('button');next.className='primary';next.textContent=listenAt===4?'Ergebnis ansehen':'Weiter →';next.onclick=()=>{listenAt++;listenAnswered=false;listenRender();};area.append(next);};area.append(b);}area.append(feedback);
  // Speech is triggered only from explicit click, not automatically on page load.
 }
-document.getElementById('listenStart').onclick=()=>{if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){showToast('Hörtraining braucht eine Sprachausgabe.');return;}listening=shuffled(vocabulary.calls).slice(0,5);listenAt=0;listenScore=0;listenAnswered=false;listenRender();speakEnglish(listening[0][0]);};
+document.getElementById('listenStart').onclick=()=>{if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){showToast('Hörtraining braucht eine Sprachausgabe.');return;}listening=shuffled(vocabulary.calls).slice(0,5);listenAt=0;listenScore=0;listenAnswered=false;speakEnglish(listening[0][0]);listenRender();};
 replay.onclick=()=>{if(listening[listenAt])speakEnglish(listening[listenAt][0]);};
 
 // v3: local-only check-in, backup/restore, and accessibility.
