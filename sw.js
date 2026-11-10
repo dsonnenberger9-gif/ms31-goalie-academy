@@ -1,4 +1,4 @@
-const CACHE='ms31-academy-v10-7-smart-learning';
+const CACHE='ms31-academy-v10-8-goalie-scenarios';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./icon-maskable-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('ms31-academy-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
